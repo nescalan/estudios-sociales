@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llanuras de Costa Rica · Juego</title>
+    <!-- W3.CSS (suave y simple) -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f5f0e7 0%, #d9e6d4 100%);
+            font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .game-wrapper {
+            max-width: 780px;
+            width: 100%;
+            background: rgba(255, 248, 235, 0.8);
+            backdrop-filter: blur(3px);
+            border-radius: 60px 60px 40px 40px;
+            padding: 24px 22px 30px;
+            box-shadow: 0 20px 30px rgba(0, 40, 20, 0.3);
+            border: 3px solid #f3d9b1;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #1f4f2b;
+            margin-top: 0;
+            margin-bottom: 6px;
+            text-shadow: 3px 3px 0 #c7e0b0;
+            letter-spacing: 1px;
+            word-break: break-word;
+        }
+        .subhead {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #3d6b41;
+            background: #e6f0da;
+            border-radius: 40px;
+            padding: 8px 16px;
+            display: inline-block;
+            margin: 0 auto 16px;
+            border: 2px dashed #4f7e4a;
+        }
+        .score-area {
+            background: #1a3a1e;
+            border-radius: 100px;
+            padding: 10px 22px;
+            color: #f9f2d9;
+            font-weight: bold;
+            font-size: 1.6rem;
+            display: inline-block;
+            box-shadow: inset 0 -4px 0 #5b8c4b;
+            margin-bottom: 14px;
+            border: 2px solid #b9b075;
+        }
+        .question-box {
+            background: #fefcf3;
+            border-radius: 40px;
+            padding: 20px 18px 10px;
+            box-shadow: 0 8px 0 #b8a889, 0 10px 20px rgba(0,0,0,0.1);
+            border: 3px solid #b8a889;
+        }
+        .question-text {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #1d3e1d;
+            margin: 0 0 18px 0;
+            line-height: 1.3;
+            padding: 0 8px;
+            background: #e5f0d6;
+            border-radius: 30px;
+            padding: 12px 18px;
+            border-left: 12px solid #7fa86a;
+        }
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 18px 0 8px;
+        }
+        .opt-btn {
+            background: #f3f7ee;
+            border: 4px solid #aebf9e;
+            border-radius: 60px;
+            padding: 16px 18px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #1f3b1a;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.1s ease-in;
+            box-shadow: 0 5px 0 #879b78;
+            cursor: pointer;
+            width: 100%;
+            background: #fafff0;
+        }
+        .opt-btn:hover {
+            transform: scale(1.01);
+            background: #e7f3d6;
+            border-color: #6f9462;
+        }
+        .opt-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #6b7d5e;
+        }
+        .opt-btn span.letter {
+            background: #506b3e;
+            color: white;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .opt-btn.disabled-true {
+            opacity: 0.7;
+            pointer-events: none;
+            filter: grayscale(0.2);
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 20px;
+            gap: 12px;
+        }
+        .btn-reset {
+            background: #b68b5c;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 28px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+            box-shadow: 0 6px 0 #6f5337;
+            border: 2px solid #dbb88a;
+            cursor: pointer;
+            transition: 0.08s linear;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-reset:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #5f432c;
+        }
+        .btn-reset:hover {
+            background: #c49a67;
+        }
+        .w3-modal-content {
+            border-radius: 50px 50px 30px 30px;
+            background: #f9f7ec;
+            padding: 18px 28px 28px;
+            max-width: 520px;
+            border: 5px solid #93aa7a;
+            box-shadow: 0 15px 30px #1f3f1a;
+        }
+        .w3-modal {
+            padding-top: 40px;
+        }
+        .modal-header {
+            font-size: 2rem;
+            font-weight: bold;
+            border-bottom: 4px dashed #b3b78b;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .modal-body {
+            font-size: 1.3rem;
+            line-height: 1.5;
+            background: #f5f7e3;
+            padding: 16px 18px;
+            border-radius: 30px;
+        }
+        .modal-body .correct-answer {
+            background: #b1d8a8;
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            font-weight: 600;
+            color: #1b461b;
+        }
+        .btn-continuar {
+            background: #40834e;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 34px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 6px 0 #1f5529;
+            cursor: pointer;
+            transition: 0.08s linear;
+            border: 2px solid #74b37a;
+            margin-top: 20px;
+            width: fit-content;
+        }
+        .btn-continuar:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #1f5529;
+        }
+        .final-msg {
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        .final-score {
+            background: #2d5a2d;
+            border-radius: 80px;
+            color: #f8f0c0;
+            padding: 8px 30px;
+            display: inline-block;
+            margin: 12px 0;
+        }
+        .w3-button {
+            background: #9ab87a;
+        }
+        @media (max-width: 500px) {
+            .question-text { font-size: 1.3rem; }
+            .opt-btn { font-size: 1.0rem; padding: 12px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper" id="appContainer">
+    <h1>🌿 Llanuras de Costa Rica</h1>
+    <div style="text-align: center;">
+        <span class="subhead">🧩 ¡El gran tapete verde!</span>
+    </div>
+    <div style="display: flex; justify-content: center;">
+        <span class="score-area" id="puntajeDisplay">⭐ 0</span>
+    </div>
+
+    <div class="question-box" id="questionBox">
+        <div class="question-text" id="preguntaTexto">Cargando pregunta…</div>
+        <div class="options-grid" id="opcionesContainer"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-reset" id="reiniciarBtn">⟳ Reiniciar juego</button>
+        <span style="font-size: 1rem; background: #d8d0b0; padding: 6px 16px; border-radius: 40px;">Pregunta <span id="contadorPregunta">1</span>/10</span>
+    </div>
+</div>
+
+<!-- Modal W3.CSS (único, reutilizable) -->
+<div id="modalFeedback" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top" style="background: #f9f7ec;">
+        <div class="modal-header" id="modalTitulo">🎉 ¡Correcto!</div>
+        <div class="modal-body" id="modalCuerpo">
+            <p id="modalMensaje">Mensaje de retroalimentación</p>
+            <div id="modalExplicacion" style="margin-top: 12px; background: #dde8d0; padding: 12px 14px; border-radius: 30px;"></div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="btn-continuar" id="modalContinuarBtn">¡Continuar!</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----------------------------------------------
+        // 1. Banco de preguntas (10) extraído del contenido
+        // ----------------------------------------------
+        const preguntasBase = [
+            {
+                pregunta: "¿Cómo se formaron las llanuras en Costa Rica?",
+                correcta: "Con piedritas y arenas que los ríos bajaban de las montañas",
+                incorrectas: [
+                    "Con lava de los volcanes",
+                    "Con agua del mar que subió",
+                    "Con viento que trajo polvo del desierto"
+                ]
+            },
+            {
+                pregunta: "¿Cuál es la altura aproximada de las llanuras sobre el nivel del mar?",
+                correcta: "De 0 a 500 metros",
+                incorrectas: [
+                    "De 500 a 1000 metros",
+                    "De 1000 a 2000 metros",
+                    "Más de 2000 metros"
+                ]
+            },
+            {
+                pregunta: "¿Qué se siembra en las Llanuras del Norte?",
+                correcta: "Bananos, piña, arroz y cítricos (naranjas)",
+                incorrectas: [
+                    "Café, caña y palma africana",
+                    "Papaya, yuca y palmito",
+                    "Cacao, tabaco y maíz"
+                ]
+            },
+            {
+                pregunta: "¿Qué trabajos se realizan en las Llanuras del Pacífico?",
+                correcta: "Ganadería de leche y carne, y fábricas de abonos",
+                incorrectas: [
+                    "Explotación de madera fina para muebles",
+                    "Pesca y cultivo de camarones",
+                    "Minería de oro y plata"
+                ]
+            },
+            {
+                pregunta: "¿Qué cultivos son típicos de las Llanuras del Caribe?",
+                correcta: "Banano, plátano, piña, palmito, yuca y papaya",
+                incorrectas: [
+                    "Cítricos, arroz y caña de azúcar",
+                    "Café, macadamia y flores",
+                    "Trigo, cebada y avena"
+                ]
+            },
+            {
+                pregunta: "¿Cómo se les llama a las llanuras del norte y del Caribe por su origen?",
+                correcta: "Tierras sedi (por sedimentos)",
+                incorrectas: [
+                    "Tierras volcánicas",
+                    "Llanuras coralinas",
+                    "Tierras eólicas"
+                ]
+            },
+            {
+                pregunta: "¿Qué actividad económica se menciona para las Llanuras del Norte?",
+                correcta: "Explotación de madera fina para muebles y ganadería",
+                incorrectas: [
+                    "Fábricas de abonos y ganadería de leche",
+                    "Pesca y turismo",
+                    "Cultivo de flores y viveros"
+                ]
+            },
+            {
+                pregunta: "¿Entre qué se encuentran las Llanuras del Pacífico?",
+                correcta: "Entre la costa pacífica y las montañas",
+                incorrectas: [
+                    "Entre las cordilleras del norte y Nicaragua",
+                    "Entre las montañas centrales y el mar Caribe",
+                    "Entre el océano Pacífico y el mar Caribe"
+                ]
+            },
+            {
+                pregunta: "¿Cuál es la característica principal de las llanuras?",
+                correcta: "Son tierras planas, bajas y extensas",
+                incorrectas: [
+                    "Son tierras altas y montañosas",
+                    "Son terrenos muy quebrados con cerros",
+                    "Son mesetas elevadas con valles"
+                ]
+            },
+            {
+                pregunta: "¿Por qué las llanuras son ideales para la agricultura?",
+                correcta: "Porque son súper extensas y tienen suelos fértiles (sedimentos)",
+                incorrectas: [
+                    "Porque tienen mucho viento y sol todo el año",
+                    "Porque están cerca del mar y hay lluvia constante",
+                    "Porque tienen muchos árboles para sombra"
+                ]
+            }
+        ];
+
+        // Mezcla las opciones de cada pregunta y las guarda con su respuesta correcta
+        function prepararPreguntas() {
+            return preguntasBase.map(p => {
+                // Construir arreglo de opciones: [correcta, inc1, inc2, inc3]
+                let opciones = [p.correcta, ...p.incorrectas];
+                // Mezclar aleatoriamente (Fisher–Yates)
+                for (let i = opciones.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [opciones[i], opciones[j]] = [opciones[j], opciones[i]];
+                }
+                // Guardar cuál es la correcta (texto)
+                return {
+                    pregunta: p.pregunta,
+                    opciones: opciones,
+                    correcta: p.correcta,
+                    // para explicación: guardamos un texto amigable para niños
+                    explicacion: generarExplicacion(p)
+                };
+            });
+        }
+
+        // Explicaciones claras para niños de 8 años
+        function generarExplicacion(p) {
+            const texto = p.pregunta.toLowerCase();
+            if (texto.includes('formaron')) {
+                return '✨ Los ríos bajan piedritas, arena y tierra desde las montañas y las van dejando en las partes bajas, como si hicieran un rompecabezas plano. ¡Por eso las llanuras son tan extensas y fértiles!';
+            } else if (texto.includes('altura')) {
+                return '📏 Las llanuras son tierras bajitas: desde el nivel del mar hasta 500 metros de altura. ¡Como si estuvieras en la playa y subieras un poco!';
+            } else if (texto.includes('norte')) {
+                return '🍌 En las Llanuras del Norte se da mucho el banano, la piña, el arroz y las naranjas. ¡Son frutas y granos que crecen muy bien ahí!';
+            } else if (texto.includes('pacífico')) {
+                return '🐄 En las Llanuras del Pacífico hay muchas vacas para leche y carne, y también grandes fábricas que hacen abonos para las plantas.';
+            } else if (texto.includes('caribe')) {
+                return '🌴 En el Caribe crecen bananos, plátanos, piñas, palmito, yuca y papaya. ¡Es una tierra súper productiva!';
+            } else if (texto.includes('tierras sedi') || texto.includes('sedimentos')) {
+                return '🧩 "Tierras sedi" viene de "sedimentos", que son los regalitos de piedra, tierra y arena que los ríos dejan al bajar de las montañas.';
+            } else if (texto.includes('madera')) {
+                return '🪵 En las Llanuras del Norte se aprovecha la madera fina para hacer muebles bonitos, y también hay ganadería.';
+            } else if (texto.includes('pacífico') && texto.includes('encuentran')) {
+                return '🌊 Las Llanuras del Pacífico están pegaditas al mar Pacífico y al pie de las montañas. ¡Así que tienen playa y montaña cerca!';
+            } else if (texto.includes('característica')) {
+                return '🌾 Las llanuras son planas, bajas y enormes. Como un tapete verde muy grande. ¡Por eso se llaman "el gran tapete verde"!';
+            } else if (texto.includes('agricultura')) {
+                return '🌱 Como son planas y tienen tierra fértil (sedimentos), las llanuras son perfectas para sembrar muchos alimentos. ¡Por eso hay tantas fincas!';
+            }
+            return '✅ ¡Así es! Recuerda que las llanuras son tierras planas y fértiles formadas por sedimentos de los ríos.';
+        }
+
+        // ------------------- ESTADO DEL JUEGO --------------------
+        let preguntasJuego = [];
+        let indiceActual = 0;
+        let puntaje = 0;
+        let juegoTerminado = false;
+        let opcionSeleccionada = false; // bloquear doble click
+
+        const preguntaTextoEl = document.getElementById('preguntaTexto');
+        const opcionesContainer = document.getElementById('opcionesContainer');
+        const puntajeDisplay = document.getElementById('puntajeDisplay');
+        const contadorPregunta = document.getElementById('contadorPregunta');
+        const reiniciarBtn = document.getElementById('reiniciarBtn');
+
+        // Modal
+        const modal = document.getElementById('modalFeedback');
+        const modalTitulo = document.getElementById('modalTitulo');
+        const modalMensaje = document.getElementById('modalMensaje');
+        const modalExplicacion = document.getElementById('modalExplicacion');
+        const modalContinuarBtn = document.getElementById('modalContinuarBtn');
+
+        // Funciones
+        function mezclarArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function reiniciarJuego() {
+            // Mezclar preguntas
+            let base = prepararPreguntas();
+            preguntasJuego = mezclarArray(base);
+            indiceActual = 0;
+            puntaje = 0;
+            juegoTerminado = false;
+            opcionSeleccionada = false;
+            actualizarPuntaje();
+            mostrarPregunta();
+            // Ocultar modal si está abierto
+            modal.style.display = 'none';
+            // Habilitar clicks
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('disabled-true'));
+        }
+
+        function actualizarPuntaje() {
+            puntajeDisplay.innerHTML = `⭐ ${puntaje}`;
+        }
+
+        function mostrarPregunta() {
+            if (indiceActual >= preguntasJuego.length) {
+                // Juego terminado: mostrar modal final
+                mostrarModalFinal();
+                return;
+            }
+            const p = preguntasJuego[indiceActual];
+            preguntaTextoEl.textContent = p.pregunta;
+            contadorPregunta.textContent = indiceActual + 1;
+
+            // Limpiar opciones
+            opcionesContainer.innerHTML = '';
+            const letras = ['A', 'B', 'C', 'D'];
+            p.opciones.forEach((texto, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerHTML = `<span class="letter">${letras[idx]}</span> ${texto}`;
+                btn.dataset.opcion = texto;
+                btn.addEventListener('click', function(e) {
+                    if (opcionSeleccionada || juegoTerminado) return;
+                    manejarRespuesta(texto, p);
+                });
+                opcionesContainer.appendChild(btn);
+            });
+            opcionSeleccionada = false;
+            // remover disabled
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('disabled-true'));
+        }
+
+        function manejarRespuesta(opcionElegida, preguntaActual) {
+            opcionSeleccionada = true;
+            // deshabilitar botones visualmente
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.add('disabled-true'));
+
+            const esCorrecta = (opcionElegida === preguntaActual.correcta);
+            if (esCorrecta) {
+                puntaje++;
+                actualizarPuntaje();
+                mostrarModalCorrecto(preguntaActual);
+            } else {
+                mostrarModalIncorrecto(opcionElegida, preguntaActual);
+            }
+        }
+
+        // MODALES
+        function mostrarModalCorrecto(p) {
+            modalTitulo.innerHTML = '🎉 ¡Excelente!';
+            modalMensaje.innerHTML = `✅ ¡Respuesta correcta! <br> <span style="font-size:1.8rem;">✨</span>`;
+            modalExplicacion.innerHTML = `<div style="background: #b1d8a8; border-radius: 30px; padding: 14px;"><strong>📘 Explicación:</strong> ${p.explicacion}</div>`;
+            modal.style.display = 'block';
+            modalContinuarBtn.onclick = function() {
+                modal.style.display = 'none';
+                avanzarPregunta();
+            };
+        }
+
+        function mostrarModalIncorrecto(opcionElegida, p) {
+            modalTitulo.innerHTML = '❌ ¡Ups! Vuelve a intentarlo';
+            modalMensaje.innerHTML = `Tú elegiste: <span style="background: #f4b3b3; padding: 4px 14px; border-radius: 30px;">${opcionElegida}</span>`;
+            modalExplicacion.innerHTML = `
+                <div style="background: #f7d7b0; border-radius: 30px; padding: 14px;">
+                    <strong>🔍 La respuesta correcta es:</strong> 
+                    <span class="correct-answer">${p.correcta}</span><br><br>
+                    <strong>📘 Explicación:</strong> ${p.explicacion}
+                </div>
+            `;
+            modal.style.display = 'block';
+            modalContinuarBtn.onclick = function() {
+                modal.style.display = 'none';
+                avanzarPregunta();
+            };
+        }
+
+        function mostrarModalFinal() {
+            modalTitulo.innerHTML = '🏁 ¡Terminaste!';
+            modalMensaje.innerHTML = `
+                <div class="final-msg">
+                    🎈 Has completado las 10 preguntas.<br>
+                    <span class="final-score">⭐ ${puntaje} / 10</span>
+                </div>
+                <p style="font-size:1.3rem;">${puntaje >= 8 ? '¡Eres un experto en las llanuras!' : '¡Sigue así, cada día aprendes más!'}</p>
+            `;
+            modalExplicacion.innerHTML = `<div style="background: #d4dbb0; border-radius: 30px; padding: 12px;">🌿 ¡Gran trabajo! Puedes reiniciar para jugar de nuevo.</div>`;
+            modal.style.display = 'block';
+            juegoTerminado = true;
+            modalContinuarBtn.onclick = function() {
+                modal.style.display = 'none';
+                // opcional: puede quedarse en la última pregunta, pero se puede reiniciar
+            };
+        }
+
+        function avanzarPregunta() {
+            indiceActual++;
+            if (indiceActual >= preguntasJuego.length) {
+                mostrarModalFinal();
+            } else {
+                mostrarPregunta();
+            }
+        }
+
+        // Evento reiniciar
+        reiniciarBtn.addEventListener('click', function() {
+            reiniciarJuego();
+            modal.style.display = 'none';
+        });
+
+        // Inicializar
+        window.addEventListener('load', function() {
+            reiniciarJuego();
+        });
+
+        // Permitir cerrar modal con click fuera (opcional) pero mejor con botón
+        // No lo cerramos con click fuera para evitar confusiones.
+    })();
+</script>
+</body>
+</html>

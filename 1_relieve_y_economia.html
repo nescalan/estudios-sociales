@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relieve de Costa Rica · Juego con Modal</title>
+  <!-- W3.CSS para el modal (ligero y simple) -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f5f0e7 0%, #e8dfd1 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game-container {
+      max-width: 1200px;
+      width: 100%;
+      background: #fcf8f0;
+      border-radius: 60px 60px 40px 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+      padding: 30px 25px 35px;
+      border: 2px solid #d8c9b2;
+      transition: all 0.2s;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: #2d4a2c;
+      letter-spacing: 1px;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1 small {
+      font-size: 1rem;
+      background: #b8a78b;
+      color: #2c2a24;
+      padding: 4px 18px;
+      border-radius: 40px;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    .score-area {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 20px;
+      padding: 0 8px;
+    }
+
+    .score-box {
+      background: #d9d0bd;
+      padding: 10px 28px;
+      border-radius: 60px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1e3b1d;
+      box-shadow: inset 0 -3px 0 #b09d82;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-box span {
+      background: #29251e;
+      color: #f5edd9;
+      padding: 0 18px;
+      border-radius: 40px;
+      font-size: 2rem;
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .game-board {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .column {
+      flex: 1 1 0;
+      min-width: 180px;
+      background: #f2ecdf;
+      border-radius: 48px 48px 28px 28px;
+      padding: 18px 10px 20px;
+      box-shadow: inset 0 2px 8px rgba(90, 70, 50, 0.08), 0 6px 0 #cbbca5;
+      border-bottom: 3px solid #b3a086;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: background 0.15s;
+    }
+
+    .column.true-col {
+      background: #deedd9;
+    }
+    .column.false-col {
+      background: #f0dbd5;
+    }
+
+    .column h2 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: #2d3d2a;
+      background: rgba(255, 255, 240, 0.6);
+      padding: 4px 30px;
+      border-radius: 60px;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+      backdrop-filter: blur(2px);
+      border: 1px solid #cdbcab;
+    }
+
+    .column.false-col h2 {
+      color: #6d3d31;
+    }
+
+    .drop-zone {
+      min-height: 280px;
+      width: 100%;
+      padding: 12px 6px;
+      background: rgba(235, 225, 210, 0.3);
+      border-radius: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.2s;
+      border: 3px dashed transparent;
+    }
+
+    .drop-zone.drag-over {
+      background: rgba(180, 200, 150, 0.3);
+      border-color: #7b8f63;
+    }
+
+    .card-item {
+      background: #fefcf5;
+      padding: 18px 16px;
+      border-radius: 40px;
+      box-shadow: 0 6px 0 #b7a68b, 0 10px 16px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 240px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #1e2c1a;
+      border: 2px solid #dacbb8;
+      cursor: grab;
+      transition: all 0.1s ease;
+      margin: 4px auto;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .card-item:active {
+      cursor: grabbing;
+      opacity: 0.6;
+      transform: scale(0.97);
+    }
+
+    .card-item.dragging {
+      opacity: 0.3;
+      transform: scale(0.9);
+    }
+
+    .center-pile {
+      flex: 1.2;
+      min-width: 220px;
+      background: #f2e9dc;
+      border-radius: 60px 60px 30px 30px;
+      padding: 18px 16px 25px;
+      box-shadow: inset 0 -6px 0 #c7b69b, 0 6px 0 #b3a086;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-bottom: 3px solid #ac987d;
+    }
+
+    .center-pile h2 {
+      font-size: 1.6rem;
+      background: #e3d6c1;
+      padding: 4px 32px;
+      border-radius: 60px;
+      color: #2e3d27;
+      margin-bottom: 12px;
+    }
+
+    .card-pile {
+      min-height: 280px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px 6px;
+    }
+
+    .card-pile .card-item {
+      cursor: grab;
+      background: #ffe9d4;
+      border-color: #c8ad8a;
+      box-shadow: 0 6px 0 #b39673, 0 8px 16px rgba(0, 0, 0, 0.1);
+      font-weight: 600;
+      max-width: 280px;
+    }
+
+    .reset-btn {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .reset-btn button {
+      background: #6f8b66;
+      border: none;
+      padding: 14px 48px;
+      border-radius: 80px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #f7f2e6;
+      box-shadow: 0 6px 0 #3f5a38;
+      cursor: pointer;
+      transition: all 0.05s linear;
+      letter-spacing: 1px;
+      border: 1px solid #90a984;
+    }
+
+    .reset-btn button:active {
+      transform: translateY(5px);
+      box-shadow: 0 1px 0 #3f5a38;
+    }
+
+    .footer-small {
+      margin-top: 18px;
+      text-align: right;
+      font-size: 0.9rem;
+      color: #6b5e4b;
+    }
+
+    /* Personalización del modal W3.CSS */
+    .w3-modal-content {
+      border-radius: 40px;
+      max-width: 500px;
+      background: #fcf8f0;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      border: 2px solid #d8c9b2;
+      padding: 10px 10px 20px;
+    }
+
+    .w3-modal-content .w3-container {
+      padding: 24px 28px;
+    }
+
+    .modal-icon {
+      font-size: 3.8rem;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .modal-titulo {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 6px 0 12px;
+    }
+
+    .modal-texto {
+      font-size: 1.15rem;
+      text-align: center;
+      background: #ede7db;
+      padding: 16px 18px;
+      border-radius: 40px;
+      margin: 16px 0 20px;
+      line-height: 1.6;
+      border-left: 6px solid #7f9f7a;
+    }
+
+    .modal-texto.error {
+      border-left-color: #b15e4a;
+      background: #f7e3dd;
+    }
+
+    .modal-texto .respuesta-corregida {
+      display: block;
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: #d4e8d0;
+      border-radius: 30px;
+      font-weight: 600;
+      color: #1d4a1a;
+      border: 2px solid #7f9f7a;
+    }
+
+    .modal-texto.error .respuesta-corregida {
+      background: #f5d4cc;
+      border-color: #b15e4a;
+      color: #6d2f1f;
+    }
+
+    .modal-btn {
+      display: flex;
+      justify-content: center;
+      margin: 8px 0 4px;
+    }
+
+    .modal-btn button {
+      background: #6f8b66;
+      border: none;
+      padding: 12px 44px;
+      border-radius: 60px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: white;
+      box-shadow: 0 4px 0 #3f5a38;
+      cursor: pointer;
+      transition: 0.06s linear;
+      border: 1px solid #90a984;
+    }
+
+    .modal-btn button:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #3f5a38;
+    }
+
+    .w3-button.w3-display-topright {
+      font-size: 2rem;
+      background: transparent;
+      border: none;
+      color: #6b5e4b;
+      transition: 0.15s;
+    }
+    .w3-button.w3-display-topright:hover {
+      color: #2d1f0e;
+      background: #e3d6c1;
+      border-radius: 40px;
+    }
+
+    @media (max-width: 770px) {
+      .game-board {
+        flex-direction: column;
+      }
+      .column, .center-pile {
+        flex: 1 1 auto;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <h1>
+    🇨🇷 Relieve de Costa Rica
+    <small>arrastra · 3° primaria</small>
+  </h1>
+
+  <div class="score-area">
+    <div class="score-box">🏆 <span id="puntaje">0</span></div>
+  </div>
+
+  <div class="game-board" id="gameBoard">
+    <!-- Columna VERDADERO -->
+    <div class="column true-col" id="columnaVerdadero">
+      <h2>✔ Verdadero</h2>
+      <div class="drop-zone" id="dropVerdadero"></div>
+    </div>
+
+    <!-- Columna central: mazo de tarjetas -->
+    <div class="center-pile" id="centroPila">
+      <h2>📇 Tarjetas</h2>
+      <div class="card-pile" id="pilaTarjetas"></div>
+    </div>
+
+    <!-- Columna FALSO -->
+    <div class="column false-col" id="columnaFalso">
+      <h2>✘ Falso</h2>
+      <div class="drop-zone" id="dropFalso"></div>
+    </div>
+  </div>
+
+  <div class="reset-btn">
+    <button id="reiniciarBtn">🔄 Reiniciar juego</button>
+  </div>
+  <div class="footer-small">Basado en el relieve de Costa Rica · arrastra cada afirmación</div>
+</div>
+
+<!-- MODAL (W3.CSS) -->
+<div id="modalFeedback" class="w3-modal">
+  <div class="w3-modal-content w3-animate-zoom">
+    <div class="w3-container">
+      <span onclick="document.getElementById('modalFeedback').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+      <div class="modal-icon" id="modalIcon">✅</div>
+      <div class="modal-titulo" id="modalTitulo">¡Correcto!</div>
+      <div class="modal-texto" id="modalTexto">Has acertado.</div>
+      <div class="modal-btn">
+        <button onclick="document.getElementById('modalFeedback').style.display='none'">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // ---------- DEFINICIÓN DE AFIRMACIONES (Verdadero / Falso) ----------
+    const afirmaciones = [
+      { texto: "El relieve es el conjunto de formas de la superficie terrestre.", esVerdadero: true },
+      { texto: "El relieve del interior incluye cordilleras, volcanes, valles y llanuras.", esVerdadero: true },
+      { texto: "El relieve costero o exterior está en contacto con el mar.", esVerdadero: true },
+      { texto: "Una punta es una entrada extensa de tierra rodeada por agua, excepto por una parte conectada a tierra firme.", esVerdadero: false },
+      { texto: "Una península es una entrada pequeña de tierra que penetra en el mar.", esVerdadero: false },
+      { texto: "Un golfo es una entrada extensa de mar en la costa.", esVerdadero: true },
+      { texto: "Una bahía es una entrada de mar en la costa menor que un golfo.", esVerdadero: true },
+      { texto: "Una isla es una porción de tierra rodeada de agua por todas partes.", esVerdadero: true },
+      { texto: "El archipiélago es lo mismo que una península.", esVerdadero: false },
+      { texto: "Una punta es una entrada pequeña de tierra que penetra en el mar.", esVerdadero: true }
+    ];
+
+    // ---------- ESTADO ----------
+    let tarjetasRestantes = [];
+    let puntaje = 0;
+
+    // Elementos DOM
+    const pilaTarjetas = document.getElementById('pilaTarjetas');
+    const dropVerdadero = document.getElementById('dropVerdadero');
+    const dropFalso = document.getElementById('dropFalso');
+    const puntajeSpan = document.getElementById('puntaje');
+    const reiniciarBtn = document.getElementById('reiniciarBtn');
+
+    // Elementos del modal
+    const modal = document.getElementById('modalFeedback');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalTitulo = document.getElementById('modalTitulo');
+    const modalTexto = document.getElementById('modalTexto');
+
+    // ---------- FUNCIONES AUXILIARES ----------
+    function actualizarPuntaje() {
+      puntajeSpan.textContent = puntaje;
+    }
+
+    // Obtener la explicación correcta para cada afirmación (para niños)
+    function obtenerExplicacion(textoAfirmacion, esVerdadero) {
+      // Definir respuestas claras y educativas para cada afirmación
+      const explicaciones = {
+        "El relieve es el conjunto de formas de la superficie terrestre.": {
+          true: "El relieve SÍ es el conjunto de todas las formas que tiene la superficie de la Tierra.",
+          false: "El relieve SÍ es el conjunto de formas de la superficie terrestre. ¡Es correcto!"
+        },
+        "El relieve del interior incluye cordilleras, volcanes, valles y llanuras.": {
+          true: "¡Correcto! El relieve del interior incluye cordilleras, volcanes, valles y llanuras.",
+          false: "El relieve del interior SÍ incluye cordilleras, volcanes, valles y llanuras."
+        },
+        "El relieve costero o exterior está en contacto con el mar.": {
+          true: "¡Así es! El relieve costero o exterior está en contacto con el mar.",
+          false: "El relieve costero o exterior SÍ está en contacto con el mar."
+        },
+        "Una punta es una entrada extensa de tierra rodeada por agua, excepto por una parte conectada a tierra firme.": {
+          true: "Una punta NO es una entrada extensa. Una punta es una entrada PEQUEÑA de tierra que penetra en el mar.",
+          false: "Una punta es una entrada PEQUEÑA de tierra que penetra en el mar. ¡Así es!"
+        },
+        "Una península es una entrada pequeña de tierra que penetra en el mar.": {
+          true: "Una península NO es una entrada pequeña. Una península es una entrada EXTENSA de tierra rodeada por agua, excepto por una parte conectada a tierra firme.",
+          false: "Una península es una entrada EXTENSA de tierra rodeada por agua, excepto por una parte conectada a tierra firme."
+        },
+        "Un golfo es una entrada extensa de mar en la costa.": {
+          true: "¡Correcto! Un golfo es una entrada extensa de mar en la costa.",
+          false: "Un golfo SÍ es una entrada extensa de mar en la costa."
+        },
+        "Una bahía es una entrada de mar en la costa menor que un golfo.": {
+          true: "¡Así es! Una bahía es una entrada de mar en la costa más pequeña que un golfo.",
+          false: "Una bahía SÍ es una entrada de mar en la costa más pequeña que un golfo."
+        },
+        "Una isla es una porción de tierra rodeada de agua por todas partes.": {
+          true: "¡Correcto! Una isla es una porción de tierra rodeada de agua por todas partes.",
+          false: "Una isla SÍ es una porción de tierra rodeada de agua por todas partes."
+        },
+        "El archipiélago es lo mismo que una península.": {
+          true: "El archipiélago NO es lo mismo que una península. Un archipiélago es un conjunto de islas.",
+          false: "El archipiélago es un conjunto de islas, NO es lo mismo que una península."
+        },
+        "Una punta es una entrada pequeña de tierra que penetra en el mar.": {
+          true: "¡Correcto! Una punta es una entrada pequeña de tierra que penetra en el mar.",
+          false: "Una punta SÍ es una entrada pequeña de tierra que penetra en el mar."
+        }
+      };
+
+      // Buscar la explicación, si no existe, usar una genérica
+      if (explicaciones[textoAfirmacion]) {
+        return esVerdadero ? explicaciones[textoAfirmacion].true : explicaciones[textoAfirmacion].false;
+      }
+
+      // Explicación genérica
+      return esVerdadero 
+        ? `"${textoAfirmacion}" es VERDADERO. ¡Así es!`
+        : `"${textoAfirmacion}" es FALSO. La respuesta correcta es la contraria.`;
+    }
+
+    // Muestra el modal con el mensaje correspondiente
+    function mostrarModal(esCorrecto, textoAfirmacion, esVerdadero) {
+      const respuestaCorrecta = esVerdadero ? 'verdadero' : 'falso';
+      const explicacion = obtenerExplicacion(textoAfirmacion, esVerdadero);
+
+      if (esCorrecto) {
+        modalIcon.textContent = '🎉';
+        modalTitulo.textContent = '¡Correcto!';
+        modalTexto.className = 'modal-texto';
+        modalTexto.innerHTML = `
+          <strong>“${textoAfirmacion}”</strong><br>
+          es <strong>${respuestaCorrecta}</strong>.
+          <span class="respuesta-corregida">${explicacion}</span>
+        `;
+      } else {
+        modalIcon.textContent = '💡';
+        modalTitulo.textContent = '¡Ups! Vamos a aprender';
+        modalTexto.className = 'modal-texto error';
+        modalTexto.innerHTML = `
+          <strong>“${textoAfirmacion}”</strong><br>
+          <span style="color: #b15e4a;">No es ${respuestaCorrecta === 'verdadero' ? 'falso' : 'verdadero'}.</span>
+          <span class="respuesta-corregida">✅ ${explicacion}</span>
+        `;
+      }
+      modal.style.display = 'block';
+    }
+
+    // Cierra el modal
+    window.cerrarModal = function() {
+      modal.style.display = 'none';
+    };
+
+    // Renderiza las tarjetas que están en la pila central
+    function renderizarPila() {
+      pilaTarjetas.innerHTML = '';
+      if (tarjetasRestantes.length === 0) {
+        const emptyMsg = document.createElement('div');
+        emptyMsg.className = 'card-item';
+        emptyMsg.style.background = '#d4d0c0';
+        emptyMsg.style.cursor = 'default';
+        emptyMsg.style.boxShadow = 'none';
+        emptyMsg.textContent = '🎉 ¡Todas listas!';
+        pilaTarjetas.appendChild(emptyMsg);
+        return;
+      }
+
+      const primera = tarjetasRestantes[0];
+      const card = document.createElement('div');
+      card.className = 'card-item';
+      card.textContent = primera.texto;
+      card.draggable = true;
+      card.dataset.id = primera.id;
+      card.dataset.verdadero = primera.esVerdadero ? 'true' : 'false';
+      card.addEventListener('dragstart', handleDragStart);
+      card.addEventListener('dragend', handleDragEnd);
+      pilaTarjetas.appendChild(card);
+    }
+
+    function popTarjeta() {
+      if (tarjetasRestantes.length === 0) return null;
+      return tarjetasRestantes.shift();
+    }
+
+    // ---------- MANEJADORES DRAG & DROP ----------
+    function handleDragStart(e) {
+      const card = e.target.closest('.card-item');
+      if (!card) return;
+      if (tarjetasRestantes.length === 0) {
+        e.preventDefault();
+        return false;
+      }
+      e.dataTransfer.setData('text/plain', card.dataset.id);
+      e.dataTransfer.effectAllowed = 'move';
+      card.classList.add('dragging');
+    }
+
+    function handleDragEnd(e) {
+      const card = e.target.closest('.card-item');
+      if (card) card.classList.remove('dragging');
+      document.querySelectorAll('.drop-zone').forEach(dz => dz.classList.remove('drag-over'));
+    }
+
+    function setupDropZones() {
+      [dropVerdadero, dropFalso].forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          zone.classList.add('drag-over');
+        });
+        zone.addEventListener('dragleave', () => {
+          zone.classList.remove('drag-over');
+        });
+        zone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zone.classList.remove('drag-over');
+          manejarDrop(e, zone);
+        });
+      });
+    }
+
+    function manejarDrop(e, dropZone) {
+      const idTarjeta = e.dataTransfer.getData('text/plain');
+      if (!idTarjeta) return;
+
+      const primeraCard = pilaTarjetas.querySelector('.card-item');
+      if (!primeraCard) {
+        return;
+      }
+
+      if (primeraCard.dataset.id !== idTarjeta) {
+        mostrarModal(false, '⚠️ Solo puedes arrastrar la tarjeta visible', false);
+        return;
+      }
+
+      const esVerdadero = primeraCard.dataset.verdadero === 'true';
+      const texto = primeraCard.textContent;
+
+      let esDropVerdadero = false;
+      if (dropZone.id === 'dropVerdadero') esDropVerdadero = true;
+      else if (dropZone.id === 'dropFalso') esDropVerdadero = false;
+
+      const acierto = (esVerdadero === esDropVerdadero);
+
+      // Eliminar la tarjeta de la pila
+      popTarjeta();
+
+      if (acierto) {
+        puntaje += 1;
+        actualizarPuntaje();
+        mostrarModal(true, texto, esVerdadero);
+      } else {
+        mostrarModal(false, texto, esVerdadero);
+      }
+
+      // Renderizar siguiente tarjeta
+      renderizarPila();
+
+      // Si no quedan tarjetas, mostrar mensaje final
+      if (tarjetasRestantes.length === 0) {
+        setTimeout(() => {
+          if (modal.style.display === 'none' || modal.style.display === '') {
+            modalIcon.textContent = '🏁';
+            modalTitulo.textContent = '¡Juego completado!';
+            modalTexto.className = 'modal-texto';
+            modalTexto.innerHTML = `🌟 Has clasificado todas las tarjetas.<br>Tu puntaje final es: <strong>${puntaje}</strong>`;
+            modal.style.display = 'block';
+          } else {
+            window.mostrarFinalAlCerrar = true;
+          }
+        }, 300);
+      }
+    }
+
+    // ---------- REINICIAR JUEGO ----------
+    function reiniciarJuego() {
+      tarjetasRestantes = afirmaciones.map((item, index) => ({
+        id: 'card-' + Date.now() + '-' + index,
+        texto: item.texto,
+        esVerdadero: item.esVerdadero
+      }));
+      // Barajar
+      for (let i = tarjetasRestantes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tarjetasRestantes[i], tarjetasRestantes[j]] = [tarjetasRestantes[j], tarjetasRestantes[i]];
+      }
+
+      puntaje = 0;
+      actualizarPuntaje();
+      dropVerdadero.innerHTML = '';
+      dropFalso.innerHTML = '';
+      renderizarPila();
+      modal.style.display = 'none';
+      window.mostrarFinalAlCerrar = false;
+    }
+
+    // ---------- INICIALIZACIÓN ----------
+    function init() {
+      reiniciarJuego();
+      setupDropZones();
+
+      document.addEventListener('dragover', (e) => e.preventDefault());
+      document.addEventListener('drop', (e) => e.preventDefault());
+
+      const closeModalBtn = document.querySelector('#modalFeedback .modal-btn button');
+      const closeX = document.querySelector('#modalFeedback .w3-display-topright');
+
+      function cerrarYVerificarFinal() {
+        modal.style.display = 'none';
+        if (window.mostrarFinalAlCerrar && tarjetasRestantes.length === 0) {
+          window.mostrarFinalAlCerrar = false;
+          modalIcon.textContent = '🏁';
+          modalTitulo.textContent = '¡Juego completado!';
+          modalTexto.className = 'modal-texto';
+          modalTexto.innerHTML = `🌟 Has clasificado todas las tarjetas.<br>Tu puntaje final es: <strong>${puntaje}</strong>`;
+          modal.style.display = 'block';
+        }
+      }
+
+      closeModalBtn.addEventListener('click', cerrarYVerificarFinal);
+      closeX.addEventListener('click', cerrarYVerificarFinal);
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          cerrarYVerificarFinal();
+        }
+      });
+    }
+
+    reiniciarBtn.addEventListener('click', reiniciarJuego);
+
+    init();
+  })();
+</script>
+</body>
+</html>

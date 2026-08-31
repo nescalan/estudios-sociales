@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇨🇷 Estudios Sociales - Costa Rica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .flag-decoration {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 2em;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .module-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .module-card:nth-child(1) {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .module-card:nth-child(2) {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .module-card:nth-child(3) {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+        }
+
+        .module-card:nth-child(4) {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+        }
+
+        .module-card:nth-child(5) {
+            background: linear-gradient(135deg, #fddb92 0%, #d1fdff 100%);
+        }
+
+        .module-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .module-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .module-description {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .play-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: white;
+            color: #333;
+            border-radius: 25px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            background: #333;
+            color: white;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .stars {
+            color: #ffd700;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .modules-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .module-card {
+                padding: 20px;
+            }
+        }
+
+        /* Animación sutil para las tarjetas */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .module-card:hover {
+            animation: float 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="flag-decoration">🇨🇷</div>
+            <h1>🌎 Estudios Sociales</h1>
+            <p>¡Aprende sobre Costa Rica jugando!</p>
+        </div>
+
+        <div class="modules-grid">
+            <!-- Módulo 1: Relieve y Economía -->
+            <div class="module-card" onclick="window.location.href='1_relieve_y_economia.html'">
+                <span class="module-icon">🏔️</span>
+                <div class="module-title">Relieve y Economía</div>
+                <div class="module-description">Descubre las montañas, valles y cómo el relieve afecta la economía de Costa Rica</div>
+                <a href="1_relieve_y_economia.html" class="play-button">▶ Jugar</a>
+            </div>
+
+            <!-- Módulo 2: Gigantes de Piedra -->
+            <div class="module-card" onclick="window.location.href='2_gigantes_de_piedra.html'">
+                <span class="module-icon">🗿</span>
+                <div class="module-title">Gigantes de Piedra</div>
+                <div class="module-description">Conoce las esferas de piedra precolombinas y su importancia histórica</div>
+                <a href="2_gigantes_de_piedra.html" class="play-button">▶ Jugar</a>
+            </div>
+
+            <!-- Módulo 3: Valles, Ríos y Tierras Fértiles -->
+            <div class="module-card" onclick="window.location.href='3_valles_rios_y_tierras_fertiles.html'">
+                <span class="module-icon">🌾</span>
+                <div class="module-title">Valles y Ríos</div>
+                <div class="module-description">Explora los valles fértiles y los ríos que dan vida a nuestro país</div>
+                <a href="3_valles_rios_y_tierras_fertiles.html" class="play-button">▶ Jugar</a>
+            </div>
+
+            <!-- Módulo 4: Las Llanuras -->
+            <div class="module-card" onclick="window.location.href='4_las_llanuras.html'">
+                <span class="module-icon">🌿</span>
+                <div class="module-title">Las Llanuras</div>
+                <div class="module-description">Viaja por las extensas llanuras del Caribe y el Pacífico Norte</div>
+                <a href="4_las_llanuras.html" class="play-button">▶ Jugar</a>
+            </div>
+
+            <!-- Módulo 5: Nuestras Costas -->
+            <div class="module-card" onclick="window.location.href='5_nuestras_costas.html'">
+                <span class="module-icon">🏖️</span>
+                <div class="module-title">Nuestras Costas</div>
+                <div class="module-description">Navega por las hermosas costas del Pacífico y el Caribe</div>
+                <a href="5_nuestras_costas.html" class="play-button">▶ Jugar</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="stars">⭐ ⭐ ⭐</p>
+            <p>¡Diviértete aprendiendo sobre nuestra hermosa Costa Rica! 🇨🇷</p>
+            <p style="margin-top: 10px; font-size: 0.8em;">Creado con ❤️ para estudiantes de 3° primaria</p>
+        </div>
+    </div>
+
+    <script>
+        // Efecto de sonido opcional al hacer clic (puedes agregar archivos de audio si lo deseas)
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Aquí podrías agregar un efecto de sonido
+                console.log('Módulo seleccionado:', this.querySelector('.module-title').textContent);
+            });
+        });
+
+        // Animación de entrada para las tarjetas
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.module-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

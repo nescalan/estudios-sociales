@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>🌊 Nuestras Costas · Costa Rica</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #b3e5fc 0%, #81d4fa 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .game-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(3px);
+            border-radius: 70px 70px 40px 40px;
+            padding: 25px 20px 35px;
+            box-shadow: 0 15px 30px rgba(0, 20, 30, 0.3);
+            border: 3px solid #f5f9ff;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #01579b;
+            text-shadow: 3px 3px 0 #b3e5fc, 5px 5px 0 rgba(0,0,0,0.1);
+            letter-spacing: 2px;
+            margin-top: -5px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        h1 small {
+            font-size: 1.2rem;
+            background: #ffcc02;
+            padding: 5px 18px;
+            border-radius: 60px;
+            color: #01579b;
+            box-shadow: 0 4px 0 #b38f00;
+        }
+
+        .score-area {
+            background: #0d2b45;
+            border-radius: 100px;
+            padding: 8px 25px;
+            display: inline-block;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #08212e;
+            margin: 5px auto 20px;
+            border: 2px solid #ffd54f;
+        }
+        .score-area span {
+            background: #ffd54f;
+            color: #0d2b45;
+            padding: 0 18px;
+            border-radius: 60px;
+            margin-left: 10px;
+        }
+
+        .columns {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0 25px;
+        }
+
+        .col {
+            flex: 1 1 180px;
+            min-width: 140px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(2px);
+            border-radius: 60px 60px 30px 30px;
+            padding: 20px 12px 25px;
+            border: 3px dashed #0288d1;
+            box-shadow: inset 0 0 0 2px #ffffff80, 0 8px 12px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: 0.2s;
+        }
+        .col.verdadero {
+            border-color: #2e7d32;
+            background: #e8f5e9d0;
+        }
+        .col.falso {
+            border-color: #c62828;
+            background: #ffebeed0;
+        }
+        .col h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 10px;
+            padding: 5px 0;
+            background: white;
+            border-radius: 80px;
+            box-shadow: 0 4px 0 #b0bec5;
+        }
+        .col.verdadero h2 { color: #1b5e20; }
+        .col.falso h2 { color: #b71c1c; }
+
+        .drop-zone {
+            min-height: 80px;
+            background: rgba(255,255,240,0.3);
+            border-radius: 40px;
+            padding: 10px 5px;
+            margin-top: 8px;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #555;
+            font-style: italic;
+        }
+        .drop-zone.drag-over {
+            background: rgba(255, 255, 200, 0.7);
+            border: 3px dashed #ffa726;
+        }
+
+        /* Mazo central */
+        .card-deck {
+            flex: 0 0 240px;
+            background: #ffecb3;
+            border-radius: 80px 80px 30px 30px;
+            padding: 20px 8px;
+            box-shadow: inset 0 -6px 0 #d4a373, 0 12px 20px rgba(0,0,0,0.2);
+            border: 3px solid #ffe082;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-deck h3 {
+            background: #a66b32;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 0 #5d3a1a;
+        }
+
+        .card {
+            background: white;
+            border-radius: 70px 70px 30px 30px;
+            padding: 25px 12px;
+            min-width: 180px;
+            max-width: 220px;
+            min-height: 110px;
+            margin: 6px auto;
+            box-shadow: 0 12px 0 #b0a084, 0 8px 15px rgba(0,0,0,0.3);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e2a3a;
+            border: 2px solid #f5e3c9;
+            cursor: grab;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.4;
+            word-break: break-word;
+            user-select: none;
+        }
+        .card:active {
+            cursor: grabbing;
+            opacity: 0.7;
+        }
+        .card.dragging {
+            opacity: 0.3;
+            transform: scale(0.95);
+        }
+        .card-deck .card {
+            background: #fff8e7;
+            border: 3px solid #ffb74d;
+        }
+        .card-placed {
+            background: #e0e0e0;
+            opacity: 0.7;
+            filter: grayscale(0.4);
+            cursor: default;
+            pointer-events: none;
+            box-shadow: 0 4px 0 #9e9e9e;
+            transform: scale(0.95);
+        }
+
+        .btn-reset {
+            background: #ffca28;
+            border: none;
+            border-radius: 80px;
+            padding: 18px 40px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #0d2b45;
+            box-shadow: 0 8px 0 #b38f00;
+            cursor: pointer;
+            transition: 0.05s linear;
+            margin: 15px auto 5px;
+            display: inline-block;
+            border: 2px solid #ffe082;
+        }
+        .btn-reset:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #b38f00;
+        }
+
+        .footer-message {
+            margin: 10px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #01579b;
+        }
+
+        .w3-modal-content {
+            border-radius: 50px;
+            padding: 20px 25px 30px;
+            max-width: 550px;
+            background: #fefcf3;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 6px solid #ffb300;
+        }
+        .w3-modal {
+            background-color: rgba(0, 20, 30, 0.6);
+            backdrop-filter: blur(3px);
+        }
+        .modal-btn {
+            background: #0288d1;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 35px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 6px 0 #01579b;
+            cursor: pointer;
+            transition: 0.05s linear;
+            margin: 15px 0 5px;
+        }
+        .modal-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #01579b;
+        }
+
+        @media (max-width: 700px) {
+            .columns { flex-direction: column; align-items: center; }
+            .col { width: 90%; }
+            .card-deck { width: 90%; }
+            .card { min-width: 150px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-wrapper">
+    <h1>🏝️ Nuestras Costas <small>🇨🇷</small></h1>
+    <div style="text-align: center;">
+        <div class="score-area">⭐ Puntaje <span id="scoreDisplay">0</span></div>
+    </div>
+
+    <div class="columns" id="columnsContainer">
+        <!-- Columna Verdadero -->
+        <div class="col verdadero" id="colVerdadero" data-zone="verdadero">
+            <h2>✅ Verdadero</h2>
+            <div class="drop-zone" id="dropVerdadero">Suelta aquí</div>
+        </div>
+
+        <!-- Mazo central -->
+        <div class="card-deck" id="cardDeck">
+            <h3>📇 Mazo</h3>
+            <div id="deckContainer" style="display:flex; flex-direction:column; align-items:center; width:100%;"></div>
+            <div style="margin-top:10px; font-size:0.9rem; background:#f5e3c9; padding:3px 15px; border-radius:40px;">Arrastra la tarjeta</div>
+        </div>
+
+        <!-- Columna Falso -->
+        <div class="col falso" id="colFalso" data-zone="falso">
+            <h2>❌ Falso</h2>
+            <div class="drop-zone" id="dropFalso">Suelta aquí</div>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <button class="btn-reset" id="resetGameBtn">🔄 Reiniciar juego</button>
+    </div>
+    <div class="footer-message">🌊 Costa Pacífico · Caribe · ¡Aprende jugando!</div>
+</div>
+
+<!-- MODAL (W3.CSS) -->
+<div id="feedbackModal" class="w3-modal">
+    <div class="w3-modal-content">
+        <div class="w3-container" id="modalContent">
+            <h2 id="modalTitle" style="font-size:2.2rem; margin:0 0 10px;">🎉</h2>
+            <div id="modalBody" style="font-size:1.4rem; line-height:1.5; padding:5px;"></div>
+            <button class="modal-btn" id="modalContinueBtn">Continuar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- Afirmaciones (10) ----------
+        const statements = [
+            { text: "Las costas de Costa Rica están en el océano Pacífico y en el mar Caribe.", isTrue: true },
+            { text: "La costa del Pacífico mide aproximadamente 212 km.", isTrue: false },
+            { text: "La costa del Caribe se extiende desde punta Castilla hasta el río Sixaola.", isTrue: true },
+            { text: "Una península es una entrada extensa de mar en la costa.", isTrue: false },
+            { text: "El golfo es una entrada extensa de mar en la costa.", isTrue: true },
+            { text: "Una punta es una porción de tierra rodeada de agua.", isTrue: false },
+            { text: "Una isla es una porción de tierra rodeada de agua.", isTrue: true },
+            { text: "La costa del Pacífico es casi lineal.", isTrue: false },
+            { text: "La costa del Caribe posee bahías, islas y puntas.", isTrue: true },
+            { text: "La costa del Pacífico presenta numerosas puntas, cabos, golfos y penínsulas.", isTrue: true }
+        ];
+
+        // ---------- Estado ----------
+        let currentCards = [];
+        let currentIndex = 0;
+        let score = 0;
+        let gameFinished = false;
+
+        // Elementos DOM
+        const deckContainer = document.getElementById('deckContainer');
+        const dropVerdadero = document.getElementById('dropVerdadero');
+        const dropFalso = document.getElementById('dropFalso');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const resetBtn = document.getElementById('resetGameBtn');
+
+        // Modal
+        const modal = document.getElementById('feedbackModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalContinueBtn = document.getElementById('modalContinueBtn');
+
+        // ---------- Funciones auxiliares ----------
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initGame() {
+            const shuffled = shuffleArray([...statements]);
+            currentCards = shuffled.map((item, idx) => ({
+                ...item,
+                id: idx + '_' + Date.now() + '_' + Math.random()
+            }));
+            currentIndex = 0;
+            score = 0;
+            gameFinished = false;
+            updateScore();
+
+            // Restaurar textos de drop zones
+            dropVerdadero.innerHTML = 'Suelta aquí';
+            dropFalso.innerHTML = 'Suelta aquí';
+
+            renderDeck();
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
+        }
+
+        function renderDeck() {
+            deckContainer.innerHTML = '';
+            if (currentIndex >= currentCards.length) {
+                gameFinished = true;
+                deckContainer.innerHTML = `<div style="padding:20px;font-size:1.6rem;background:#c8e6c9;border-radius:60px;">🎯 ¡Completaste todas!</div>`;
+                showFinalModal();
+                return;
+            }
+
+            const cardData = currentCards[currentIndex];
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'card';
+            cardDiv.draggable = true;
+            cardDiv.textContent = cardData.text;
+            cardDiv.dataset.id = cardData.id;
+            cardDiv.dataset.true = cardData.isTrue ? 'true' : 'false';
+
+            cardDiv.addEventListener('dragstart', handleDragStart);
+            cardDiv.addEventListener('dragend', handleDragEnd);
+
+            deckContainer.appendChild(cardDiv);
+        }
+
+        function handleDragStart(e) {
+            if (gameFinished) {
+                e.preventDefault();
+                return false;
+            }
+            const deckCards = deckContainer.querySelectorAll('.card');
+            if (deckCards.length > 0 && deckCards[0] !== e.target) {
+                e.preventDefault();
+                return false;
+            }
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+            e.dataTransfer.effectAllowed = 'move';
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function setupDropZones() {
+            const zones = [dropVerdadero, dropFalso];
+
+            zones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+
+                    if (gameFinished) return;
+
+                    const cardId = e.dataTransfer.getData('text/plain');
+                    if (!cardId) return;
+
+                    const deckCards = deckContainer.querySelectorAll('.card');
+                    if (deckCards.length === 0) return;
+                    const currentCardElem = deckCards[0];
+                    if (currentCardElem.dataset.id !== cardId) return;
+
+                    const cardData = currentCards[currentIndex];
+                    if (!cardData) return;
+
+                    const parentCol = zone.closest('.col');
+                    if (!parentCol) return;
+                    const zoneType = parentCol.dataset.zone;
+
+                    const userSaysTrue = (zoneType === 'verdadero');
+                    const isCorrect = (userSaysTrue === cardData.isTrue);
+
+                    showFeedbackModal(cardData, isCorrect, userSaysTrue);
+
+                    if (isCorrect) {
+                        score++;
+                        updateScore();
+                    }
+
+                    // Avanzar sin acumular tarjetas en las columnas
+                    currentIndex++;
+                    renderDeck();
+
+                    // Restaurar texto de zona si ya no hay más cartas
+                    if (currentIndex >= currentCards.length) {
+                        dropVerdadero.innerHTML = 'Suelta aquí';
+                        dropFalso.innerHTML = 'Suelta aquí';
+                    }
+                });
+            });
+        }
+
+        function showFeedbackModal(cardData, isCorrect, userSaysTrue) {
+            const correctAnswer = cardData.isTrue ? 'Verdadero' : 'Falso';
+            const userAnswer = userSaysTrue ? 'Verdadero' : 'Falso';
+
+            if (isCorrect) {
+                modalTitle.innerHTML = '🎉 ¡Correcto!';
+                modalBody.innerHTML = `
+                    <div style="background:#e8f5e9; border-radius:40px; padding:15px;">
+                        <p style="font-size:1.8rem; margin:0;">✅ ¡Muy bien!</p>
+                        <p style="font-size:1.3rem;"><strong>“${cardData.text}”</strong></p>
+                        <p style="background:#c8e6c9; padding:10px; border-radius:40px;">Es <strong>Verdadero</strong> 👍</p>
+                    </div>
+                `;
+            } else {
+                let explanation = '';
+                if (cardData.isTrue) {
+                    explanation = `La afirmación correcta es <strong>Verdadero</strong>. ${cardData.text}`;
+                } else {
+                    explanation = `La afirmación correcta es <strong>Falso</strong>. `;
+                    if (cardData.text.includes('212 km')) {
+                        explanation += 'La costa del Pacífico mide aproximadamente 1254 km, no 212 km. ¡El Caribe mide 212 km!';
+                    } else if (cardData.text.includes('península') && cardData.text.includes('extensa de mar')) {
+                        explanation += 'Una península es una entrada extensa de TIERRA rodeada de agua, excepto por una parte. Un GOLFO es una entrada de mar.';
+                    } else if (cardData.text.includes('punta') && cardData.text.includes('porción de tierra rodeada de agua')) {
+                        explanation += 'Una punta es una entrada de tierra PEQUEÑA que penetra en el mar. Una ISLA es la porción de tierra rodeada de agua.';
+                    } else if (cardData.text.includes('casi lineal')) {
+                        explanation += 'La costa del Pacífico es muy IRREGULAR, con puntas, cabos, golfos y penínsulas. La costa del Caribe es casi lineal.';
+                    } else {
+                        explanation += 'Revisa la información: ' + cardData.text;
+                    }
+                }
+                modalTitle.innerHTML = '😅 ¡Ups!';
+                modalBody.innerHTML = `
+                    <div style="background:#ffebee; border-radius:40px; padding:15px;">
+                        <p style="font-size:1.5rem; margin:0 0 8px;"><strong>“${cardData.text}”</strong></p>
+                        <p style="font-size:1.2rem;">Tú dijiste: <strong>${userAnswer}</strong></p>
+                        <div style="background:#ffcdd2; padding:12px; border-radius:40px; margin-top:12px;">
+                            <p style="margin:0; font-size:1.2rem;">📘 <strong>Explicación:</strong> ${explanation}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function showFinalModal() {
+            modalTitle.innerHTML = '🏁 ¡Juego completado!';
+            let msg = `¡Has terminado todas las tarjetas!<br>⭐ Puntaje final: <strong>${score}</strong> de ${currentCards.length}`;
+            if (score === currentCards.length) msg += '<br>🎊 ¡Perfecto! Eres un experto en costas.';
+            else if (score >= currentCards.length * 0.7) msg += '<br>👏 ¡Muy bien! Sigue aprendiendo.';
+            else msg += '<br>💪 ¡Sigue practicando, lo lograrás!';
+            modalBody.innerHTML = `
+                <div style="background:#e3f2fd; border-radius:40px; padding:20px; font-size:1.6rem; text-align:center;">
+                    ${msg}
+                    <br><span style="font-size:1.8rem;">🌊🇨🇷</span>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = score;
+        }
+
+        function resetGame() {
+            closeModal();
+            initGame();
+        }
+
+        function init() {
+            initGame();
+            setupDropZones();
+
+            modalContinueBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+            resetBtn.addEventListener('click', resetGame);
+        }
+
+        init();
+    })();
+</script>
+</body>
+</html>
