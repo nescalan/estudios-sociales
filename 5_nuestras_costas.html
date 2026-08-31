@@ -85,6 +85,7 @@
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: flex-start; /* 👈 Clave: alinea las columnas en la parte superior */
             gap: 15px;
             margin: 20px 0 25px;
         }
@@ -100,6 +101,8 @@
             box-shadow: inset 0 0 0 2px #ffffff80, 0 8px 12px rgba(0,0,0,0.1);
             text-align: center;
             transition: 0.2s;
+            display: flex;
+            flex-direction: column;
         }
         .col.verdadero {
             border-color: #2e7d32;
@@ -128,9 +131,18 @@
             padding: 10px 5px;
             margin-top: 8px;
             transition: 0.2s;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .drop-zone.drag-over {
+            background: #f1e4b0;
+            border: 3px dashed #f7b731;
+            border-radius: 40px;
         }
 
-        /* Mazo central */
+        /* Mazo central - se mantiene fijo gracias a align-items: flex-start */
         .card-deck {
             flex: 0 0 240px;
             background: #ffecb3;
@@ -256,6 +268,31 @@
             transform: translateY(4px);
             box-shadow: 0 2px 0 #01579b;
         }
+        /* Historial de respuestas */
+        .history-container {
+            margin-top: 5px;
+            padding: 5px 10px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.3);
+            font-size: 0.8rem;
+            color: #1e2a3a;
+        }
+        .history-container .history-item {
+            display: inline-block;
+            margin: 2px 3px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .history-item.correcto {
+            background: #a5d6a7;
+            color: #1b5e20;
+        }
+        .history-item.incorrecto {
+            background: #ef9a9a;
+            color: #b71c1c;
+        }
 
         @media (max-width: 700px) {
             .columns { flex-direction: column; align-items: center; }
@@ -277,6 +314,7 @@
         <div class="col verdadero" id="colVerdadero" data-zone="verdadero">
             <h2>✅ Verdadero</h2>
             <div class="drop-zone" id="dropVerdadero"></div>
+            <div class="history-container" id="historyVerdadero"></div>
         </div>
 
         <!-- Mazo central -->
@@ -290,6 +328,7 @@
         <div class="col falso" id="colFalso" data-zone="falso">
             <h2>❌ Falso</h2>
             <div class="drop-zone" id="dropFalso"></div>
+            <div class="history-container" id="historyFalso"></div>
         </div>
     </div>
 
@@ -327,15 +366,18 @@
         ];
 
         // ---------- Estado ----------
-        let currentCards = [];            // array de objetos { text, isTrue, id }
-        let currentIndex = 0;            // indice de la carta visible (primera del mazo)
+        let currentCards = [];
+        let currentIndex = 0;
         let score = 0;
         let gameFinished = false;
+        let historial = [];
 
         // Elementos DOM
         const deckContainer = document.getElementById('deckContainer');
         const dropVerdadero = document.getElementById('dropVerdadero');
         const dropFalso = document.getElementById('dropFalso');
+        const historyVerdadero = document.getElementById('historyVerdadero');
+        const historyFalso = document.getElementById('historyFalso');
         const scoreDisplay = document.getElementById('scoreDisplay');
         const resetBtn = document.getElementById('resetGameBtn');
 
@@ -354,9 +396,47 @@
             return arr;
         }
 
-        // Inicializar / reiniciar
+        function actualizarHistorial() {
+            historyVerdadero.innerHTML = '';
+            historyFalso.innerHTML = '';
+
+            const verdaderos = historial.filter(h => h.userAnswer === 'verdadero');
+            const falsos = historial.filter(h => h.userAnswer === 'falso');
+
+            function crearElementoHistorial(item) {
+                const span = document.createElement('span');
+                span.className = `history-item ${item.isCorrect ? 'correcto' : 'incorrecto'}`;
+                const icono = item.isCorrect ? '✅' : '❌';
+                const textoCorto = item.text.length > 30 ? item.text.substring(0, 28) + '…' : item.text;
+                span.textContent = `${icono} ${textoCorto}`;
+                span.title = `${item.text} → ${item.isCorrect ? 'Correcto' : 'Incorrecto'}`;
+                return span;
+            }
+
+            verdaderos.forEach(item => {
+                historyVerdadero.appendChild(crearElementoHistorial(item));
+            });
+            falsos.forEach(item => {
+                historyFalso.appendChild(crearElementoHistorial(item));
+            });
+
+            if (verdaderos.length === 0) {
+                const placeholder = document.createElement('span');
+                placeholder.textContent = '📋 Esperando respuestas…';
+                placeholder.style.fontSize = '0.8rem';
+                placeholder.style.opacity = '0.6';
+                historyVerdadero.appendChild(placeholder);
+            }
+            if (falsos.length === 0) {
+                const placeholder = document.createElement('span');
+                placeholder.textContent = '📋 Esperando respuestas…';
+                placeholder.style.fontSize = '0.8rem';
+                placeholder.style.opacity = '0.6';
+                historyFalso.appendChild(placeholder);
+            }
+        }
+
         function initGame() {
-            // mezclar cartas
             const shuffled = shuffleArray([...statements]);
             currentCards = shuffled.map((item, idx) => ({
                 ...item,
@@ -365,22 +445,21 @@
             currentIndex = 0;
             score = 0;
             gameFinished = false;
+            historial = [];
             updateScore();
+            actualizarHistorial();
 
-            // limpiar zonas de drop
             dropVerdadero.innerHTML = '';
             dropFalso.innerHTML = '';
 
             renderDeck();
-            // remover clase dragging de cualquier carta
             document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
+            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
         }
 
-        // renderizar mazo (solo la carta actual, si existe)
         function renderDeck() {
             deckContainer.innerHTML = '';
             if (currentIndex >= currentCards.length) {
-                // juego terminado: mostrar mensaje final
                 gameFinished = true;
                 deckContainer.innerHTML = `<div style="padding:20px;font-size:1.6rem;background:#c8e6c9;border-radius:60px;">🎯 ¡Completaste todas!</div>`;
                 showFinalModal();
@@ -395,26 +474,22 @@
             cardDiv.dataset.id = cardData.id;
             cardDiv.dataset.true = cardData.isTrue ? 'true' : 'false';
 
-            // eventos drag
             cardDiv.addEventListener('dragstart', handleDragStart);
             cardDiv.addEventListener('dragend', handleDragEnd);
 
             deckContainer.appendChild(cardDiv);
         }
 
-        // Drag & Drop
         function handleDragStart(e) {
             if (gameFinished) {
                 e.preventDefault();
                 return false;
             }
-            // Solo la primera carta (visible) es arrastrable
             const deckCards = deckContainer.querySelectorAll('.card');
             if (deckCards.length > 0 && deckCards[0] !== e.target) {
                 e.preventDefault();
                 return false;
             }
-            // guardar datos
             e.dataTransfer.setData('text/plain', e.target.dataset.id);
             e.dataTransfer.effectAllowed = 'move';
             e.target.classList.add('dragging');
@@ -422,69 +497,71 @@
 
         function handleDragEnd(e) {
             e.target.classList.remove('dragging');
+            document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
         }
 
-        // Configurar drop zones
         function setupDropZones() {
             const zones = [dropVerdadero, dropFalso];
             zones.forEach(zone => {
                 zone.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
+                    zone.classList.add('drag-over');
                 });
-
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
                 zone.addEventListener('drop', (e) => {
                     e.preventDefault();
+                    zone.classList.remove('drag-over');
                     if (gameFinished) return;
 
                     const cardId = e.dataTransfer.getData('text/plain');
                     if (!cardId) return;
 
-                    // Encontrar la carta actual en el mazo (la primera)
                     const deckCards = deckContainer.querySelectorAll('.card');
                     if (deckCards.length === 0) return;
                     const currentCardElem = deckCards[0];
-                    if (currentCardElem.dataset.id !== cardId) return; // no es la carta visible
+                    if (currentCardElem.dataset.id !== cardId) return;
 
-                    // Obtener datos de la carta
                     const cardData = currentCards[currentIndex];
                     if (!cardData) return;
 
-                    // Determinar si la zona es verdadero o falso
                     const parentCol = zone.closest('.col');
                     if (!parentCol) return;
-                    const zoneType = parentCol.dataset.zone; // 'verdadero' o 'falso'
+                    const zoneType = parentCol.dataset.zone;
 
                     const userSaysTrue = (zoneType === 'verdadero');
                     const isCorrect = (userSaysTrue === cardData.isTrue);
 
-                    // Mostrar modal con feedback
-                    showFeedbackModal(cardData, isCorrect, userSaysTrue);
+                    historial.push({
+                        text: cardData.text,
+                        userAnswer: zoneType,
+                        isCorrect: isCorrect
+                    });
 
-                    // Si es correcto, sumar punto y avanzar
                     if (isCorrect) {
                         score++;
                         updateScore();
                     }
 
-                    // Eliminar la carta del mazo (avanzar) y moverla a la zona (solo visual)
-                    // Clonar para poner en drop zone
                     const cardClone = currentCardElem.cloneNode(true);
                     cardClone.draggable = false;
                     cardClone.classList.remove('dragging');
                     cardClone.classList.add('card-placed');
                     cardClone.style.cursor = 'default';
-                    // Añadir a la zona correspondiente
                     zone.appendChild(cardClone);
 
-                    // Remover del mazo
+                    actualizarHistorial();
+
+                    showFeedbackModal(cardData, isCorrect, userSaysTrue);
+
                     currentIndex++;
-                    renderDeck(); // actualiza el mazo, si terminó muestra final
+                    renderDeck();
                 });
             });
         }
 
-        // ---------- MODAL feedback ----------
         function showFeedbackModal(cardData, isCorrect, userSaysTrue) {
             const correctAnswer = cardData.isTrue ? 'Verdadero' : 'Falso';
             const userAnswer = userSaysTrue ? 'Verdadero' : 'Falso';
@@ -504,7 +581,6 @@
                     explanation = `La afirmación correcta es <strong>Verdadero</strong>. ${cardData.text}`;
                 } else {
                     explanation = `La afirmación correcta es <strong>Falso</strong>. `;
-                    // explicación personalizada para cada falsa
                     if (cardData.text.includes('212 km')) {
                         explanation += 'La costa del Pacífico mide aproximadamente 1254 km, no 212 km. ¡El Caribe mide 212 km!';
                     } else if (cardData.text.includes('península') && cardData.text.includes('extensa de mar')) {
@@ -528,12 +604,9 @@
                     </div>
                 `;
             }
-
-            // Mostrar modal
             modal.style.display = 'block';
         }
 
-        // Modal final
         function showFinalModal() {
             modalTitle.innerHTML = '🏁 ¡Juego completado!';
             let msg = `¡Has terminado todas las tarjetas!<br>⭐ Puntaje final: <strong>${score}</strong> de ${currentCards.length}`;
@@ -549,29 +622,23 @@
             modal.style.display = 'block';
         }
 
-        // Cerrar modal (Continuar)
         function closeModal() {
             modal.style.display = 'none';
         }
 
-        // Actualizar puntaje
         function updateScore() {
             scoreDisplay.textContent = score;
         }
 
-        // ---------- Reinicio ----------
         function resetGame() {
             closeModal();
             initGame();
         }
 
-        // ---------- Inicializar ----------
         function init() {
             initGame();
             setupDropZones();
-            // Evento botón continuar modal
             modalContinueBtn.addEventListener('click', closeModal);
-            // Cerrar modal click fuera (opcional, pero w3c ya lo hace)
             window.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal();
             });
