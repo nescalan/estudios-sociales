@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
     <title>🌊 Nuestras Costas · Costa Rica</title>
+    <!-- W3.CSS (modal) -->
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <style>
         * {
@@ -121,22 +122,12 @@
         .col.falso h2 { color: #b71c1c; }
 
         .drop-zone {
-            min-height: 80px;
-            background: rgba(255,255,240,0.3);
+            min-height: 150px;
+            background: rgba(255,255,240,0.4);
             border-radius: 40px;
             padding: 10px 5px;
             margin-top: 8px;
             transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: #555;
-            font-style: italic;
-        }
-        .drop-zone.drag-over {
-            background: rgba(255, 255, 200, 0.7);
-            border: 3px dashed #ffa726;
         }
 
         /* Mazo central */
@@ -235,6 +226,7 @@
             color: #01579b;
         }
 
+        /* MODAL override W3.CSS */
         .w3-modal-content {
             border-radius: 50px;
             padding: 20px 25px 30px;
@@ -284,7 +276,7 @@
         <!-- Columna Verdadero -->
         <div class="col verdadero" id="colVerdadero" data-zone="verdadero">
             <h2>✅ Verdadero</h2>
-            <div class="drop-zone" id="dropVerdadero">Suelta aquí</div>
+            <div class="drop-zone" id="dropVerdadero"></div>
         </div>
 
         <!-- Mazo central -->
@@ -297,7 +289,7 @@
         <!-- Columna Falso -->
         <div class="col falso" id="colFalso" data-zone="falso">
             <h2>❌ Falso</h2>
-            <div class="drop-zone" id="dropFalso">Suelta aquí</div>
+            <div class="drop-zone" id="dropFalso"></div>
         </div>
     </div>
 
@@ -335,8 +327,8 @@
         ];
 
         // ---------- Estado ----------
-        let currentCards = [];
-        let currentIndex = 0;
+        let currentCards = [];            // array de objetos { text, isTrue, id }
+        let currentIndex = 0;            // indice de la carta visible (primera del mazo)
         let score = 0;
         let gameFinished = false;
 
@@ -362,7 +354,9 @@
             return arr;
         }
 
+        // Inicializar / reiniciar
         function initGame() {
+            // mezclar cartas
             const shuffled = shuffleArray([...statements]);
             currentCards = shuffled.map((item, idx) => ({
                 ...item,
@@ -373,17 +367,20 @@
             gameFinished = false;
             updateScore();
 
-            // Restaurar textos de drop zones
-            dropVerdadero.innerHTML = 'Suelta aquí';
-            dropFalso.innerHTML = 'Suelta aquí';
+            // limpiar zonas de drop
+            dropVerdadero.innerHTML = '';
+            dropFalso.innerHTML = '';
 
             renderDeck();
+            // remover clase dragging de cualquier carta
             document.querySelectorAll('.card').forEach(c => c.classList.remove('dragging'));
         }
 
+        // renderizar mazo (solo la carta actual, si existe)
         function renderDeck() {
             deckContainer.innerHTML = '';
             if (currentIndex >= currentCards.length) {
+                // juego terminado: mostrar mensaje final
                 gameFinished = true;
                 deckContainer.innerHTML = `<div style="padding:20px;font-size:1.6rem;background:#c8e6c9;border-radius:60px;">🎯 ¡Completaste todas!</div>`;
                 showFinalModal();
@@ -398,22 +395,26 @@
             cardDiv.dataset.id = cardData.id;
             cardDiv.dataset.true = cardData.isTrue ? 'true' : 'false';
 
+            // eventos drag
             cardDiv.addEventListener('dragstart', handleDragStart);
             cardDiv.addEventListener('dragend', handleDragEnd);
 
             deckContainer.appendChild(cardDiv);
         }
 
+        // Drag & Drop
         function handleDragStart(e) {
             if (gameFinished) {
                 e.preventDefault();
                 return false;
             }
+            // Solo la primera carta (visible) es arrastrable
             const deckCards = deckContainer.querySelectorAll('.card');
             if (deckCards.length > 0 && deckCards[0] !== e.target) {
                 e.preventDefault();
                 return false;
             }
+            // guardar datos
             e.dataTransfer.setData('text/plain', e.target.dataset.id);
             e.dataTransfer.effectAllowed = 'move';
             e.target.classList.add('dragging');
@@ -423,64 +424,67 @@
             e.target.classList.remove('dragging');
         }
 
+        // Configurar drop zones
         function setupDropZones() {
             const zones = [dropVerdadero, dropFalso];
-
             zones.forEach(zone => {
                 zone.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
-                    zone.classList.add('drag-over');
-                });
-
-                zone.addEventListener('dragleave', () => {
-                    zone.classList.remove('drag-over');
                 });
 
                 zone.addEventListener('drop', (e) => {
                     e.preventDefault();
-                    zone.classList.remove('drag-over');
-
                     if (gameFinished) return;
 
                     const cardId = e.dataTransfer.getData('text/plain');
                     if (!cardId) return;
 
+                    // Encontrar la carta actual en el mazo (la primera)
                     const deckCards = deckContainer.querySelectorAll('.card');
                     if (deckCards.length === 0) return;
                     const currentCardElem = deckCards[0];
-                    if (currentCardElem.dataset.id !== cardId) return;
+                    if (currentCardElem.dataset.id !== cardId) return; // no es la carta visible
 
+                    // Obtener datos de la carta
                     const cardData = currentCards[currentIndex];
                     if (!cardData) return;
 
+                    // Determinar si la zona es verdadero o falso
                     const parentCol = zone.closest('.col');
                     if (!parentCol) return;
-                    const zoneType = parentCol.dataset.zone;
+                    const zoneType = parentCol.dataset.zone; // 'verdadero' o 'falso'
 
                     const userSaysTrue = (zoneType === 'verdadero');
                     const isCorrect = (userSaysTrue === cardData.isTrue);
 
+                    // Mostrar modal con feedback
                     showFeedbackModal(cardData, isCorrect, userSaysTrue);
 
+                    // Si es correcto, sumar punto y avanzar
                     if (isCorrect) {
                         score++;
                         updateScore();
                     }
 
-                    // Avanzar sin acumular tarjetas en las columnas
-                    currentIndex++;
-                    renderDeck();
+                    // Eliminar la carta del mazo (avanzar) y moverla a la zona (solo visual)
+                    // Clonar para poner en drop zone
+                    const cardClone = currentCardElem.cloneNode(true);
+                    cardClone.draggable = false;
+                    cardClone.classList.remove('dragging');
+                    cardClone.classList.add('card-placed');
+                    cardClone.style.cursor = 'default';
+                    // Añadir a la zona correspondiente
+                    zone.appendChild(cardClone);
 
-                    // Restaurar texto de zona si ya no hay más cartas
-                    if (currentIndex >= currentCards.length) {
-                        dropVerdadero.innerHTML = 'Suelta aquí';
-                        dropFalso.innerHTML = 'Suelta aquí';
-                    }
+                    // Remover del mazo
+                    currentIndex++;
+                    renderDeck(); // actualiza el mazo, si terminó muestra final
                 });
             });
         }
 
+        // ---------- MODAL feedback ----------
         function showFeedbackModal(cardData, isCorrect, userSaysTrue) {
             const correctAnswer = cardData.isTrue ? 'Verdadero' : 'Falso';
             const userAnswer = userSaysTrue ? 'Verdadero' : 'Falso';
@@ -500,6 +504,7 @@
                     explanation = `La afirmación correcta es <strong>Verdadero</strong>. ${cardData.text}`;
                 } else {
                     explanation = `La afirmación correcta es <strong>Falso</strong>. `;
+                    // explicación personalizada para cada falsa
                     if (cardData.text.includes('212 km')) {
                         explanation += 'La costa del Pacífico mide aproximadamente 1254 km, no 212 km. ¡El Caribe mide 212 km!';
                     } else if (cardData.text.includes('península') && cardData.text.includes('extensa de mar')) {
@@ -524,9 +529,11 @@
                 `;
             }
 
+            // Mostrar modal
             modal.style.display = 'block';
         }
 
+        // Modal final
         function showFinalModal() {
             modalTitle.innerHTML = '🏁 ¡Juego completado!';
             let msg = `¡Has terminado todas las tarjetas!<br>⭐ Puntaje final: <strong>${score}</strong> de ${currentCards.length}`;
@@ -542,24 +549,29 @@
             modal.style.display = 'block';
         }
 
+        // Cerrar modal (Continuar)
         function closeModal() {
             modal.style.display = 'none';
         }
 
+        // Actualizar puntaje
         function updateScore() {
             scoreDisplay.textContent = score;
         }
 
+        // ---------- Reinicio ----------
         function resetGame() {
             closeModal();
             initGame();
         }
 
+        // ---------- Inicializar ----------
         function init() {
             initGame();
             setupDropZones();
-
+            // Evento botón continuar modal
             modalContinueBtn.addEventListener('click', closeModal);
+            // Cerrar modal click fuera (opcional, pero w3c ya lo hace)
             window.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal();
             });
